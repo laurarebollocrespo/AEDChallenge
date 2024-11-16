@@ -72,7 +72,7 @@ availability = {
     "Saturday night": True,
     "Sunday morning": True,
     "Sunday afternoon": True
-}
+}  
 
 # Llamada a la función y resultado
 score = map_availability(availability)

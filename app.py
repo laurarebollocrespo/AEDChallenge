@@ -7,8 +7,7 @@ import pandas as pd
 # Configuración de la página
 st.set_page_config(page_title="Generador de Grupos", layout="centered", page_icon="👤")
 
-with open('datathon_participants.json', 'r') as file:
-    datos = json.load(file)
+df = pd.read_json("datathon_participants.json")
 
 
 st.title("Creación de Equipos para la Datathon FME")
@@ -51,7 +50,7 @@ if st.button("Análisis equipos"):
 
     st.pyplot(fig)
 
-nombres = [persona['name'] for persona in datos]
+nombres = df['name'] # type: ignore
 
 # Generación de nombre aleatorio
 nombre_leer = st.text_input("Introduce un nombre para saber en qué equipo va:")
@@ -64,8 +63,6 @@ if nombre_leer:
 if st.button("Generar nombre aleatorio"):
     nombre_random = random.choice(nombres)
     st.session_state.nombre_input = nombre_random
-
-df = pd.read_json("datathon_participants.json")
 
 if 'nombre_input' in st.session_state:
     nombre = st.session_state.nombre_input

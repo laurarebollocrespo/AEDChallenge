@@ -3,26 +3,23 @@ import matplotlib.pyplot as plt
 import random
 import pandas as pd
 
-# Configuración de la página
 st.set_page_config(page_title="Generador de Grupos", layout="centered", page_icon="👤")
 
-# Cargar datos
 df = pd.read_json("datathon_participants.json")
 
-# Título principal
 st.title("Creación de Equipos para la Datathon FME")
 st.write("Bienvenido a nuestra herramienta interactiva para la formación de equipos.")
 
-# Crear pestañas para organizar la interfaz
+
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "Formar Equipos",
+    "Crear equipos",
     "Gráficas de Equipos",
     "Ver Equipos",
     "Análisis de Equipos",
     "Buscar Miembros"
 ])
 
-# Pestaña 1: Formar equipos
+# Pestaña 1:
 with tab1:
     st.header("Formar Equipos")
     st.write("Haz clic en el botón para generar equipos.")
@@ -30,7 +27,7 @@ with tab1:
         st.write("Procesando...")
         # Aquí llamarías a la lógica de tu backend para formar los equipos.
 
-# Pestaña 2: Gráficas de Equipos
+# Pestaña 2:
 with tab2:
     st.header("Análisis de Integrantes por Equipo")
     st.write("Visualiza la cantidad de equipos con un número específico de integrantes.")
@@ -46,7 +43,7 @@ with tab2:
 
         st.pyplot(fig)
 
-# Pestaña 3: Ver equipos
+# Pestaña 3: 
 with tab3:
     st.header("Propuesta de Equipos")
     st.write("Aquí puedes ver nuestra propuesta de equipos.")
@@ -54,7 +51,7 @@ with tab3:
         st.write("**Esta es nuestra propuesta de equipos:**")
         # Aquí podrías añadir más lógica para mostrar equipos formados.
 
-# Pestaña 4: Análisis de equipos
+# Pestaña 4: 
 with tab4:
     st.header("Análisis por Intenciones")
     st.write("Visualiza la cantidad de equipos según sus intenciones principales.")
@@ -70,7 +67,7 @@ with tab4:
 
         st.pyplot(fig)
 
-# Pestaña 5: Buscar miembros
+# Pestaña 5: 
 with tab5:
     st.header("Buscar Miembro en un Equipo")
     st.write("Introduce un nombre o genera uno aleatorio para saber en qué equipo está.")
@@ -101,10 +98,12 @@ with tab5:
             edad = si['age'].iloc[0]
             year_of_study = si['year_of_study'].iloc[0]
             experience_level = si['experience_level'].iloc[0]
+            objective = si['objective'].iloc[0]
 
             st.write(f"**Edad:** {edad}")
             st.write(f"**Año de estudio:** {year_of_study}")
             st.write(f"**Nivel de experiencia:** {experience_level}")
+            st.write(f"**Objetivos:** {objective}")
 
 # Estilo personalizado para los botones
 st.markdown(

@@ -242,7 +242,7 @@ def main() -> None:
     llista_participants : list = []
     teams = create_teams(participants)
     print_team_analysis(teams)
-
+    print(participants)
 
 if __name__ == '__main__':
     main()

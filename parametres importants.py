@@ -1,4 +1,5 @@
-    programming_skills: Dict[str, int]
+year_of_study: Literal["1st year", "2nd year", "3rd year", "4th year", "Masters", "PhD"]    
+programming_skills: Dict[str, int]
     experience_level: Literal["Beginner", "Intermediate", "Advanced"]
     hackathons_done: int
 

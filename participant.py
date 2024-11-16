@@ -45,11 +45,11 @@ def calculate_objective_score(p1: Participant) -> int:
     """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
     
     p1_intention = classificador_ai(p1.objective)
-    if p1_intention is 'socialize':
+    if p1_intention == 'socialize':
         return 1
-    elif p1_intention is 'learn':
+    elif p1_intention == 'learn':
         return 2
-    elif p1_intention is 'enjoy':
+    elif p1_intention == 'enjoy':
         return 3
     else:
         return 4

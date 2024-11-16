@@ -35,12 +35,12 @@ class Participant:
 
 def create_teams(participants: List[Participant]) -> List[List[Participant]]:
     # Aquí creamos los equipos de participantes
-    teams = []  # Lista vacía para almacenar los equipos
+    teams : list[int] = []  # Lista vacía para almacenar los equipos
     available_participants = participants.copy()  # Copia de la lista de participantes para no modificar la original
 
     # Mientras haya participantes disponibles
     while available_participants:
-        team = []  # Creamos un equipo vacío
+        team : list[int] = []  # Creamos un equipo vacío
         # Agregamos hasta 4 participantes al equipo, o todos los participantes restantes si son menos de 4
         for _ in range(min(4, len(available_participants))):
             if available_participants:
@@ -103,6 +103,7 @@ participant2 = Participant(
     },
 )
 
+
 # Aquí creamos una lista con los dos participantes
 participants = [participant1, participant2]
 
@@ -115,4 +116,3 @@ for team in teams:
     for participant in team:
         print(f"- {participant.name}")
     print()
-    

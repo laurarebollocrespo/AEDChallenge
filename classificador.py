@@ -1,18 +1,35 @@
 from transformers import pipeline
 
-# Crear el pipeline de clasificación "zero-shot"
-clasificador = pipeline("zero-shot-classification", model="typeform/distilbert-base-uncased-mnli")
+def classificador_ai(text: str) -> str:
+    '''
+    Dado un un texto devuelve la predicción de las intenciones de las personas.
+    Posibles etiquetas: socialize, learn, enjoy, win.
+    '''
 
-# Definir las etiquetas de intenciones
-etiquetas = ["I want to socialize or meet new people", "I want to level up my programming skills", "I want to have fun and enjoy", "I want to win."]
+    # Crear el pipeline de clasificación "zero-shot"
+    clasificador = pipeline("zero-shot-classification", model="typeform/distilbert-base-uncased-mnli")
 
-# Texto de ejemplo
-texto = "I'm all about vibin' with fellow datathoners! For me, this datathon is about making new friends and having an absolute blast. I'm excited to participate in as many events as I can, like workshops, mini-competitions, and even social activities. I want to explore new skills and techniques, but mostly, I want to connect with like-minded people and share laughter and memories. Let's do this!"
+    # Definir las etiquetas de intenciones y su mapeo a etiquetas cortas
+    long_label = [
+        "I want to socialize or meet new people",
+        "I want to level up my programming skills",
+        "I want to have fun and enjoy",
+        "I want to win."
+    ]
 
-# Clasificar el texto según las etiquetas
-resultado = clasificador(texto, candidate_labels=etiquetas)
+    short_label = [
+        "socialize",
+        "learn",
+        "enjoy",
+        "win"
+    ]
 
-# Mostrar el resultado
-print("Clasificación completa:")
-for label, score in zip(resultado['labels'], resultado['scores']):
-    print(f"- {label}: {score:.2f}")
+    # Clasificar el texto según las etiquetas
+    resultado = clasificador(text, candidate_labels=long_label)
+
+    # Encontrar la etiqueta con mayor puntaje y mapearla a la etiqueta corta
+    mejor_equivalencia = resultado['labels'][0]
+    indice = long_label.index(mejor_equivalencia)
+    short_label = long_label[indice]
+
+    return short_label

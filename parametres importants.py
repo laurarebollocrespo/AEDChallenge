@@ -3,7 +3,7 @@ programming_skills: Dict[str, int]
     experience_level: Literal["Beginner", "Intermediate", "Advanced"]
     hackathons_done: int
 
-    # Interests, preferences and constraints
+    # Interests, preferences and constra
     interests: List[str]
     preferred_role: Literal[
         "Analysis", "Visualization", "Development", "Design", "Don't know", "Don't care"

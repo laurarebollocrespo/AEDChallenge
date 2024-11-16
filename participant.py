@@ -1,9 +1,10 @@
 import numpy as np
+import pandas as pd
 from typing import List, Dict, Tuple
 from dataclasses import dataclass
+from typing import Dict, List, Literal
 import uuid
-from transformers import pipeline
-from data import json
+import json
 
 @dataclass
 class Participant:
@@ -35,10 +36,6 @@ def check_absolute_restrictions(p1: Participant, p2: Participant) -> bool:
 
     if not (p1.id in p2.friend_registration or p2.id in p1.friend_registration):
         return  False
-    
-    # 3. Verificar programming skills (al menos un skill en común)
-    if not bool(set(p1.programming_skills.keys()) and set(p2.programming_skills.keys())):
-        return False
     
     return True
 
@@ -146,7 +143,7 @@ def calculate_compatibility_score(p1: Participant, p2: Participant) -> float:
     ]
     
     return sum(score * weight for score, weight in scores)
-
+'''
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
     """Crea equipos optimizando la compatibilidad y respetando las restricciones"""
     teams = []
@@ -203,6 +200,7 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
         teams.append(current_team)
     
     return teams
+'''
 
 def print_team_analysis(teams: List[List[Participant]]):
     """Imprime un análisis detallado de los equipos formados"""
@@ -233,16 +231,13 @@ def print_team_analysis(teams: List[List[Participant]]):
         
         print("-" * 30)
 
-
-
-
-
 def main() -> None:
-    participants = json.open("data/datathon_participants.json")
-    llista_participants : list = []
-    teams = create_teams(participants)
-    print_team_analysis(teams)
-    print(participants)
+    with open("data/datathon_participants.json", "r", encoding="utf-8") as archivo:
+        datos = json.load(archivo)  # Cargar el contenido como un diccionario de Python
+
+    df = pd.read_json("data/datathon_participants.json")
+    print(df.loc[df['id'] == "2ebad15c-c0ef-4c04-ba98-c5d98403a90c" ])
+          
 
 if __name__ == '__main__':
     main()

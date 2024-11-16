@@ -7,7 +7,7 @@ st.set_page_config(page_title="Generador de Grupos", layout="centered", page_ico
 
 df = pd.read_json("datathon_participants.json")
 
-st.title("Creación de Equipos para la Datathon FME")
+st.title("Creación de equipos para la Datathon FME")
 st.write("Bienvenido a nuestra herramienta interactiva para la formación de equipos.")
 
 

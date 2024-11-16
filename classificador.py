@@ -1,6 +1,11 @@
 from transformers import pipeline
 
 def classificador_ai(text: str) -> str:
+    '''
+    Dado un un texto devuelve la predicción de las intenciones de las personas.
+    Posibles etiquetas: socialize, learn, enjoy, win.
+    '''
+
     # Crear el pipeline de clasificación "zero-shot"
     clasificador = pipeline("zero-shot-classification", model="typeform/distilbert-base-uncased-mnli")
 

@@ -3,6 +3,7 @@ from typing import List, Dict, Tuple
 from dataclasses import dataclass
 import uuid
 from transformers import pipeline
+from data import json
 
 @dataclass
 class Participant:
@@ -233,11 +234,15 @@ def print_team_analysis(teams: List[List[Participant]]):
         print("-" * 30)
 
 
-# Crear lista de participantes
-participants = [...]  # Lista de objetos Participant
 
-# Crear equipos
-teams = create_teams(participants)
 
-# Analizar los equipos formados
-print_team_analysis(teams)
+
+def main() -> None:
+    participants = json.open("data/datathon_participants.json")
+    llista_participants : list = []
+    teams = create_teams(participants)
+    print_team_analysis(teams)
+
+
+if __name__ == '__main__':
+    main()

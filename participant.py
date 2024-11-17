@@ -41,7 +41,7 @@ def check_absolute_restrictions(p1: Participant, p2: Participant) -> bool:
     
     return True
 
-def calculate_objective_score_p1(p1: Participant) -> int:
+def calculate_objective_score(p1: Participant) -> int:
     """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
     
     p1_intention = classificador_ai(p1.objective)
@@ -53,15 +53,15 @@ def calculate_objective_score_p1(p1: Participant) -> int:
         return 3
     else:
         return 4
-def calculate_objective_score_p2(p2: Participant) -> int:
+def calculate_objective_score(p1: Participant) -> int:
     """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
     
-    p2_intention = classificador_ai(p2.objective)
-    if p2_intention == 'socialize':
+    p1_intention = classificador_ai(p1.objective)
+    if p1_intention == 'socialize':
         return 1
-    elif p2_intention == 'learn':
+    elif p1_intention == 'learn':
         return 2
-    elif p2_intention == 'enjoy':
+    elif p1_intention == 'enjoy':
         return 3
     else:
         return 4
@@ -108,41 +108,22 @@ def calculate_role_score(p1: Participant, p2: Participant) -> float:
         return 0.5  # Valor neutral para "Don't know" o "Don't care"
     return 1.0 if p1.preferred_role != p2.preferred_role else 0.0
 
-def calculate_experience_score_p1(p1: Participant) -> int:
+def calculate_experience_score(p1: Participant) -> int:
     """Calcula la puntuación basada en nivel de experiencia (12%)"""
     exp_levels = {"Beginner": 1, "Intermediate": 2, "Advanced": 3}
 
     return exp_levels[p1.experience_level]
 
-
-def calculate_experience_score_p2(p2: Participant) -> int:
-    """Calcula la puntuación basada en nivel de experiencia (12%)"""
-    exp_levels = {"Beginner": 1, "Intermediate": 2, "Advanced": 3}
-
-    return exp_levels[p2.experience_level]
-
-def calculate_hackathon_score_p1(p1: Participant) -> int:
+def calculate_hackathon_score(p1: Participant) -> int:
     """Calcula la puntuación basada en experiencia en hackathons (8%)"""
     return p1.hackathons_done
 
-def calculate_hackathon_score_p2(p2: Participant) -> int:
-    """Calcula la puntuación basada en experiencia en hackathons (8%)"""
-    return p2.hackathons_done
-
-
-def calculate_study_year_score_p1(p1: Participant) -> int:
+def calculate_study_year_score(p1: Participant) -> int:
     """Calcula la puntuación basada en año de estudio (8%)"""
     years = {"1st year": 1, "2nd year": 2, "3rd year": 3, "4th year": 4, 
             "Masters": 5, "PhD": 6}
 
     return years[p1.year_of_study]
-
-def calculate_study_year_score_p2(p2: Participant) -> int:
-    """Calcula la puntuación basada en año de estudio (8%)"""
-    years = {"1st year": 1, "2nd year": 2, "3rd year": 3, "4th year": 4, 
-            "Masters": 5, "PhD": 6}
-
-    return years[p2.year_of_study]
 
 def calculate_team_size_score(p1: Participant) -> int:
     """Calcula la puntuación basada en tamaño de equipo preferido (2%)"""
@@ -158,18 +139,18 @@ def calculate_availability_score(p1: Participant) -> int:
 
 
 
-def calculate_compatibility_score_p1(p1: Participant) -> float:
+def calculate_compatibility_score(p1: Participant) -> float:
     """Calcula la puntuación total de compatibilidad entre dos participantes"""
 
     # Calcular puntuaciones individuales con sus pesos
     scores = [
-        (calculate_objective_score_p1(p1), 0.45),
-        #(calculate_role_score(p1), 0.20)
-        (calculate_experience_score_p1(p1), 0.12),
-        (calculate_hackathon_score_p1(p1), 0.08),
-        (calculate_study_year_score_p1(p1), 0.08),
-        (calculate_availability_score_p1(p1), 0.05),
-        (calculate_team_size_score(p1), 0.02)
+        (calculate_objective_score(p1)),
+        (calculate_role_score(p1))
+        (calculate_experience_score(p1)),
+        (calculate_hackathon_score(p1)),
+        (calculate_study_year_score(p1)),
+        (calculate_availability_score(p1)),
+        (calculate_team_size_score(p1))
     ]
     
     return sum(score * weight for score, weight in scores)
@@ -241,6 +222,26 @@ def print_team_analysis(teams: List[List[Participant]]):
     for i, team in enumerate(teams, 1):
         print(f"\nEquipo {i} ({len(team)} miembros):")
         print("Miembros:", ", ".join(p.name for p in team))
+        'EXTRA
+        # Analizar características del equipo
+        roles = [p.preferred_role for p in team]
+        objectives = [classificador_ai(p.objective) for p in team]
+        exp_levels = [p.experience_level for p in team]
+        
+        print(f"Roles: {', '.join(roles)}")
+        print(f"Objetivos: {', '.join(objectives)}")
+        print(f"Niveles de experiencia: {', '.join(exp_levels)}")
+        
+        # Calcular compatibilidad promedio del equipo
+        if len(team) > 1:
+            scores = []
+            for i in range(len(team)):
+                for j in range(i + 1, len(team)):
+                    scores.append(calculate_compatibility_score(team[i], team[j]))
+            avg_score = np.mean(scores)
+            print(f"Compatibilidad promedio del equipo: {avg_score:.2f}")
+        
+        print("-" * 30)
         
 
 def main() -> None:

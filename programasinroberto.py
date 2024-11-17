@@ -235,14 +235,7 @@ def main() -> None:
 
     df = pd.read_json("data/datathon_participants.json")
     print(df.loc[df['id'] == "2ebad15c-c0ef-4c04-ba98-c5d98403a90c" ])
-          
-
-def noumain() -> None:
-    df = pd.read_json('data/datathon_participants.json')
-
-    persona1= df.loc[0]
-    persona2= df.loc[4]
-
+         
     print(compara(persona1, persona2))
 
 if __name__ == '__main__':

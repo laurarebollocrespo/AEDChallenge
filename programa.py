@@ -1,0 +1,1 @@
+from participant import calculate_compatibility_score

@@ -300,8 +300,13 @@ def main() -> None:
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
 
+<<<<<<< HEAD
     persona1 = df.loc[0]
     persona2 = df.loc[3]
+=======
+    persona1= df.loc[0]
+    persona2= df.loc[4]
+>>>>>>> 63d57658ee29c876c7e86c4b9f4bfbb99f70288f
 
     print(compara(persona1, persona2))
 

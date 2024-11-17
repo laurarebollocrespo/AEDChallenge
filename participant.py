@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 from typing import List, Dict
 from dataclasses import dataclass
+from transformers import pipeline
 from typing import Dict, List
 import uuid
 import json
@@ -243,8 +244,9 @@ def main() -> None:
 
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
-    persona1= df.loc[0]
-    print(calculate_compatibility_score(persona1))
+    for i in range(0,10):
+        persona1= df.loc[i]
+        print(calculate_compatibility_score(persona1))
 
 if __name__ == '__main__':
     noumain()

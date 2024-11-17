@@ -241,7 +241,7 @@ def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
 
     persona1= df.loc[0]
-    persona2= df.loc[3]
+    persona2= df.loc[4]
 
     print(compara(persona1, persona2))
 

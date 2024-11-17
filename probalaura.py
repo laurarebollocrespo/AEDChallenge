@@ -38,8 +38,7 @@ def check_absolute_restrictions(p1: Participant, p2: Participant) -> bool:
         return False
 
     return True
-
-def calculate_compatibility_score(p1: Participant) -> float:
+def calculate_compatibility_score(p1: Participant, participants: List[Participant]) -> float:
     """Calculates the overall compatibility score for a single participant"""
     scores = [
         (calculate_objective_score(p1.objective), 0.45),
@@ -52,10 +51,12 @@ def calculate_compatibility_score(p1: Participant) -> float:
     ]
 
     # Apply absolute restrictions
-    if not check_absolute_restrictions(p1, p2):
-        return 0.0
+    for p2 in participants:
+        if not check_absolute_restrictions(p1, p2):
+            return 0.0
 
     return sum(score * weight for score, weight in scores)
+
 
 def calculate_objective_score(objective: str) -> int:
     """Calculates the score based on the participant's objective (45%)"""
@@ -100,7 +101,6 @@ def calculate_team_size_score(preferred_team_size: int) -> int:
 def calculate_availability_score(availability: Dict[str, bool]) -> int:
     """Calculates the score based on the participant's availability (5%)"""
     return sum(1 for value in availability.values() if value)
-
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
     """Creates teams by optimizing compatibility and respecting restrictions"""
     teams = []
@@ -132,7 +132,7 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
             best_score = -1
             best_candidate = None
             for candidate in unassigned:
-                avg_score = calculate_compatibility_score(candidate)
+                avg_score = calculate_compatibility_score(candidate, participants)
                 if avg_score > best_score:
                     best_score = avg_score
                     best_candidate = candidate
@@ -144,6 +144,7 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
         teams.append(current_team)
 
     return teams
+
 
 def print_team_analysis(teams: List[List[Participant]]):
     """Prints a detailed analysis of the formed teams"""
@@ -170,13 +171,42 @@ def print_team_analysis(teams: List[List[Participant]]):
 
         print("-" * 30)
 
-def main() -> None:
-    with open("data/datathon_participants.json", "r", encoding="utf-8") as archivo:
-        datos = json.load(archivo)  # Cargar el contenido como un diccionario de Python
 
-    df = pd.read_json("data/datathon_participants.json")
+def load_participants_from_file(file_path: str) -> List[Participant]:
+    """
+    Lee un archivo JSON usando pandas y convierte los datos en objetos de tipo Participant.
+    """
+    # Usamos pandas para leer el archivo JSON
+    df = pd.read_json(file_path)
     
-    teams = create_teams(df)
+    participants = []
+    
+    # Convertimos cada fila del dataframe en un objeto Participant
+    for _, row in df.iterrows():
+        participant = Participant(
+            id=uuid.UUID(row["id"]),
+            name=row["name"],
+            year_of_study=row["year_of_study"],
+            programming_skills=row["programming_skills"],
+            experience_level=row["experience_level"],
+            hackathons_done=row["hackathons_done"],
+            interests=row["interests"],
+            preferred_role=row["preferred_role"],
+            objective=row["objective"],
+            interest_in_challenges=row["interest_in_challenges"],
+            preferred_languages=row["preferred_languages"],
+            friend_registration=[uuid.UUID(fid) for fid in row["friend_registration"]],
+            preferred_team_size=row["preferred_team_size"],
+            availability=row["availability"]
+        )
+        participants.append(participant)
+    
+    return participants
+
+def main() -> None:
+    llista_participants = load_participants_from_file("data/datathon_participants.json")
+    
+    teams = create_teams(llista_participants)
     print_team_analysis(teams)
     
 if __name__ == '__main__':

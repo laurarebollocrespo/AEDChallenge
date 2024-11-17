@@ -155,23 +155,6 @@ def print_team_analysis(teams: List[List[Participant]]):
         print(f"\nTeam {i} ({len(team)} members):")
         print("Members:", ", ".join(p.name for p in team))
 
-        # Analyze team characteristics
-        roles = [p.preferred_role for p in team]
-        objectives = [calculate_objective_score(p.objective) for p in team]
-        exp_levels = [p.experience_level for p in team]
-
-        print(f"Roles: {', '.join(roles)}")
-        print(f"Objectives: {', '.join(map(str, objectives))}")
-        print(f"Experience Levels: {', '.join(exp_levels)}")
-
-        # Calculate average team compatibility
-        if len(team) > 1:
-            avg_score = np.mean([calculate_compatibility_score(team[i]) for i in range(len(team))])
-            print(f"Average Team Compatibility: {avg_score:.2f}")
-
-        print("-" * 30)
-
-
 def load_participants_from_file(file_path: str) -> List[Participant]:
     """
     Lee un archivo JSON usando pandas y convierte los datos en objetos de tipo Participant.
@@ -204,7 +187,7 @@ def load_participants_from_file(file_path: str) -> List[Participant]:
     return participants
 
 def main() -> None:
-    llista_participants = load_participants_from_file("data/datathon_participants.json")
+    llista_participants = load_participants_from_file("data/datathon_participants2.json")
     
     teams = create_teams(llista_participants)
     print_team_analysis(teams)

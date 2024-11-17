@@ -30,49 +30,46 @@ def divide_by_skill(participants_df):
 
 def form_teams_by_skill(high_skill, mid_skill, low_skill, max_team_size=4):
     """
-    Form teams from participants in each skill group.
+    Form teams from participants in all skill groups and return a JSON-like structure with sequential team names.
     
     Args:
         high_skill, mid_skill, low_skill (list): Lists of participant names grouped by skill levels.
         max_team_size (int): Maximum size of each team.
     
     Returns:
-        Dict: Dictionary with teams for each skill group.
+        List: List of dictionaries with team names and members.
     """
     def form_teams_from_group(group):
         teams = []
         while group:
-            team = []
-            while len(team) < max_team_size and group:
-                team.append(group.pop(0))  # Añadir participante al equipo
-            teams.append(team)
+            team_members = []
+            while len(team_members) < max_team_size and group:
+                team_members.append(group.pop(0))  # Add participant to the team
+            teams.append(team_members)
         return teams
-    
-    # Formar equipos por cada grupo de habilidad
-    high_skill_teams = form_teams_from_group(high_skill)
-    mid_skill_teams = form_teams_from_group(mid_skill)
-    low_skill_teams = form_teams_from_group(low_skill)
-    
-    return {
-        "High Skill": high_skill_teams,
-        "Mid Skill": mid_skill_teams,
-        "Low Skill": low_skill_teams
-    }
 
-def create_teams ():
+    # Combine all groups and form teams
+    combined_groups = high_skill + mid_skill + low_skill
+    all_teams = form_teams_from_group(combined_groups)
+    
+    # Create JSON-like structure
+    teams_json = [
+        {"team_group": f"Team {i + 1}", "members": team}
+        for i, team in enumerate(all_teams)
+    ]
+    
+    return teams_json
 
-    # Crear un DataFrame de pandas
+def create_teams():
+    # Create a pandas DataFrame
     participants_df = pd.read_json("datathon_participants.json")
+
+    # Divide participants into skill groups
+    high_skill, mid_skill, low_skill = divide_by_skill(participants_df)
+
+    # Form teams and return JSON-like structure
+    teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
     
-    # Dividir participantes en grupos de habilidades
-    high_skill, mid_skill, low_skill = divide_by_skill(participants_df)
+    return json.dumps(teams_by_skill, indent=4)  # Convert to JSON string for readability
 
-    # Formar equipos por habilidad
-    teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
-
-    # Dividir participantes en grupos de habilidades
-    high_skill, mid_skill, low_skill = divide_by_skill(participants_df)
-
-    teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
-
-    return teams_by_skill
+print (create_teams())

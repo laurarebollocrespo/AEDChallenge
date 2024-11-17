@@ -96,7 +96,7 @@ if len(tab_titles) > 2:
             st.warning("You must first upload the data before accessing this tab.")
         else:
             st.header("Participants Analysis")
-            st.write("A continuación, podréis ver un resumen de las características de los participantes.")
+            st.write("Here you can see a summary od the characteristics of the participants.")
 
             df = st.session_state.df
 
@@ -106,8 +106,8 @@ if len(tab_titles) > 2:
             fig1, ax1 = plt.subplots(figsize=(4, 3))
             ax1.bar(niveles.index, niveles.values, color='#189578')
             ax1.set_title("Experience Level of Participants", fontsize=10)
-            ax1.set_xlabel("Experience Level", fontsize=8)
-            ax1.set_ylabel("Number of Participants", fontsize=8)
+            ax1.set_xlabel("Experience Level", fontsize=6)
+            ax1.set_ylabel("Number of Participants", fontsize=6)
             st.pyplot(fig1)
             st.write()
             st.write()
@@ -118,8 +118,8 @@ if len(tab_titles) > 2:
             fig3, ax3 = plt.subplots(figsize=(4, 3))
             ax3.bar(years.index, years.values, color='#189578')
             ax3.set_title("Year of Study of Participants", fontsize=10)
-            ax3.set_xlabel("Year of Study", fontsize=8)
-            ax3.set_ylabel("Number of Participants", fontsize=8)
+            ax3.set_xlabel("Year of Study", fontsize=6)
+            ax3.set_ylabel("Number of Participants", fontsize=6)
             ax3.tick_params(axis='x', rotation=45)
             st.pyplot(fig3)
 
@@ -129,6 +129,19 @@ if len(tab_titles) > 2:
             for i, (interest, count) in enumerate(intereses.items(), start=1):
                 st.write(f"{i}. {interest}: {count} participants")
 
+            # Objectives
+            st.subheader("Objectives")
+
+            objs = {'Socialize': 333, 'Enjoy': 304, 'Learn': 276, 'Win': 62}
+
+            fig, ax = plt.subplots(figsize=(4, 2))
+            ax.bar(objs.keys(), objs.values(), color='#189578')
+            ax.tick_params(axis='both', labelsize=6)
+            ax.set_title("Objectives of the Participants", fontsize=6)
+            ax.set_xlabel("", fontsize=6)
+            ax.set_ylabel("Number of Participants", fontsize=6)
+
+            st.pyplot(fig)
 # Pestaña 4: 
 if len(tab_titles) > 3:  
     with tabs[3]:

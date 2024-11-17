@@ -23,7 +23,6 @@ else:
         "Search Members"
     ]
 
-
 tabs = st.tabs(tab_titles)
 
 # Pestaña 1:
@@ -67,11 +66,9 @@ if len(tab_titles) > 1:
             if "teams" not in st.session_state or not st.session_state.teams:
                 st.warning("Teams have not been formed yet. Please go to 'Create Teams' and generate teams.")
             else:
-                # Añadimos un cuadro de texto para buscar equipos por número
                 team_input = st.text_input("Enter the team number to view details:", "")
 
                 if team_input:
-                    # Validar que el input es un número válido
                     if team_input.isdigit():
                         team_number = int(team_input)
                         if 1 <= team_number <= len(st.session_state.teams):
@@ -85,7 +82,6 @@ if len(tab_titles) > 1:
                     else:
                         st.warning("Please enter a valid number.")
 
-                # Expansores para mostrar todos los equipos
                 for i, team in enumerate(st.session_state.teams):
                     team_name = f"Team {i+1}" if not team.get("team_group") else team["team_group"]
                     with st.expander(team_name):
@@ -102,10 +98,9 @@ if len(tab_titles) > 2:
             st.header("Participants Analysis")
             st.write("A continuación, podréis ver un resumen de las características de los participantes.")
 
-            # Usamos st.session_state.df directamente
             df = st.session_state.df
 
-            # 1. Gráfica de nivel de los participantes
+            # Experience Level of Participants (Graphic)
             level_order = ["Beginner", "Intermediate", "Advanced"]
             niveles = df['experience_level'].value_counts().reindex(level_order, fill_value=0)
             fig1, ax1 = plt.subplots(figsize=(4, 3))
@@ -117,7 +112,7 @@ if len(tab_titles) > 2:
             st.write()
             st.write()
 
-            # 2. Gráfica del año de estudio
+            # Year of Study (Graphic)
             year_order = ["1st year", "2nd year", "3rd year", "4th year", "Masters", "PhD"]
             years = df['year_of_study'].value_counts().reindex(year_order, fill_value=0)
             fig3, ax3 = plt.subplots(figsize=(4, 3))
@@ -128,7 +123,7 @@ if len(tab_titles) > 2:
             ax3.tick_params(axis='x', rotation=45)
             st.pyplot(fig3)
 
-            # 3. Resumen de los intereses más populares
+            # Summary of the TOP interests
             intereses = df.explode('interests')['interests'].value_counts().head(10)
             st.subheader("Top Interests of Participants")
             for i, (interest, count) in enumerate(intereses.items(), start=1):
@@ -157,7 +152,6 @@ if len(tab_titles) > 3:
             if 'nombre_input' in st.session_state:
                 nombre = st.session_state.nombre_input
 
-                # Buscar el equipo del nombre seleccionado
                 found_team = None
                 for team in st.session_state.teams:
                     if nombre in team["members"]:
@@ -169,7 +163,7 @@ if len(tab_titles) > 3:
                     st.write(f"**Team Name:** {found_team['team_group']}")
                     st.write(f"**Teammates:**")
                     for member in found_team["members"]:
-                        if member != nombre:  # Excluir al propio miembro
+                        if member != nombre: 
                             st.write(f"- {member}")
                 else:
                     st.warning(f"{nombre} is not assigned to any team.")

@@ -3,10 +3,10 @@ import pandas as pd
 from typing import List, Dict
 from dataclasses import dataclass
 from transformers import pipeline
-from typing import List, Dict
+from typing import Dict, List
 import uuid
 import json
-
+from math import sqrt
 
 @dataclass
 class Participant:
@@ -41,30 +41,19 @@ def check_absolute_restrictions(p1: Participant, p2: Participant) -> bool:
     
     return True
 
-def calculate_objective_score(p1: Participant) -> int:
+def calculate_objective_score(p1: Participant) -> float:
     """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
     
     p1_intention = classificador_ai(p1.objective)
     if p1_intention == 'socialize':
-        return 1
+        return 1*45
     elif p1_intention == 'learn':
-        return 2
+        return 2*45
     elif p1_intention == 'enjoy':
-        return 3
+        return 3*45
     else:
-        return 4
-def calculate_objective_score(p1: Participant) -> int:
-    """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
+        return 4*45
     
-    p1_intention = classificador_ai(p1.objective)
-    if p1_intention == 'socialize':
-        return 1
-    elif p1_intention == 'learn':
-        return 2
-    elif p1_intention == 'enjoy':
-        return 3
-    else:
-        return 4
 
 
 def classificador_ai(text: str) -> str:
@@ -105,93 +94,72 @@ def calculate_role_score(p1: Participant) -> str:
     """Calcula la puntuación basada en roles preferidos (20%) - premia la diferencia"""
     return p1.preferred_role
 
-def calculate_experience_score(p1: Participant) -> int:
+def calculate_experience_score(p1: Participant) -> float:
     """Calcula la puntuación basada en nivel de experiencia (12%)"""
     exp_levels = {"Beginner": 1, "Intermediate": 2, "Advanced": 3}
 
-    return exp_levels[p1.experience_level]
+    return exp_levels[p1.experience_level]*12
 
-def calculate_hackathon_score(p1: Participant) -> int:
+def calculate_hackathon_score(p1: Participant) -> float:
     """Calcula la puntuación basada en experiencia en hackathons (8%)"""
-    return p1.hackathons_done
+    return p1.hackathons_done*8
 
-def calculate_study_year_score(p1: Participant) -> int:
+def calculate_study_year_score(p1: Participant) -> float:
     """Calcula la puntuación basada en año de estudio (8%)"""
     years = {"1st year": 1, "2nd year": 2, "3rd year": 3, "4th year": 4, 
             "Masters": 5, "PhD": 6}
 
-    return years[p1.year_of_study]
+    return years[p1.year_of_study]*8
 
-def calculate_team_size_score(p1: Participant) -> int:
+def calculate_team_size_score(p1: Participant) -> float:
     """Calcula la puntuación basada en tamaño de equipo preferido (2%)"""
-    return p1.preferred_team_size
+    return p1.preferred_team_size*2
 
-def calculate_availability_score(p1: Participant) -> int:
+
+def calculate_availability_score(p1: Participant) -> float:
     """Calcula la puntuación basada en disponibilidad (5%)"""
     p1_availability_score  = p1.availability
     comptar = sum(1 for value in p1_availability_score.values() if value)
 
-    return comptar
+    return comptar*5
 
 
 
-def calculate_compatibility_score(p1: Participant) -> float:
+def calculate_compatibility_score(p1: Participant) -> list[int|str]:
     """Calcula la puntuación total de compatibilidad entre dos participantes"""
 
     # Calcular puntuaciones individuales con sus pesos
-    scores = [
+    scores: list = [int|str]
+    scores= [
         (calculate_objective_score(p1)),
         (calculate_role_score(p1)),
         (calculate_experience_score(p1)),
         (calculate_hackathon_score(p1)),
         (calculate_study_year_score(p1)),
         (calculate_availability_score(p1)),
-        (calculate_team_size_score(p1))
-    ]
+        (calculate_team_size_score(p1)) ]
     
-    return scores #sense ponderar!
+    return scores 
 
-
-def create_list_lenguages(participants: List[Dict]) -> List[List[Dict]]:
-    """
-    Agrupa a los participantes en función de los idiomas que hablan, minimizando el número de grupos.
-    Los participantes sin idiomas (`preferred_languages` vacío) se distribuyen equitativamente entre los grupos existentes.
-
-    Args:
-        participants (list): Lista de diccionarios con los detalles de los participantes.
-
-    Returns:
-        List[List[Dict]]: Lista de grupos con los participantes como diccionarios.
-    """
-    final_groups = []
-
-    # Procesar participantes con idiomas
-    for participant in participants:
-        name = participant["name"]
-        languages = set(participant.get("preferred_languages", []))
-
-        if languages:
-            # Intentar añadir al participante a un grupo existente
-            for group in final_groups:
-                # Verificar si este participante comparte idiomas con todos los miembros del grupo
-                if all(languages & set(p.get("preferred_languages", [])) for p in group):
-                    group.append(participant)
-                    break
+def compara (p1:Participant , p2:Participant) -> float:
+    p1_score= calculate_compatibility_score(p1)
+    p2_score = calculate_compatibility_score(p2)
+    suma_score = 0
+    for i in range(len(p1_score)):
+        p1_element= p1_score[i]
+        p2_element= p2_score[i]
+        if isinstance(p1_element, str) and isinstance(p2_element, str):
+            if p1_element != p2_element:
+                suma_score = suma_score + 20
             else:
-                # Si no es compatible con ningún grupo, crear uno nuevo
-                final_groups.append([participant])
+                pass
         else:
-            # Marcar participantes sin idiomas para procesar al final
-            participant["no_languages"] = True
+            suma_score = suma_score + abs(p1_element - p2_element)**2
+    
+    compatibilitat_p1_p2=sqrt(suma_score)
+    return compatibilitat_p1_p2
+            
 
-    # Procesar participantes sin idiomas
-    no_language_participants = [p for p in participants if p.get("no_languages")]
-    for participant in no_language_participants:
-        # Distribuir equitativamente entre los grupos más pequeños
-        smallest_group = min(final_groups, key=len)
-        smallest_group.append(participant)
-
-    return final_groups
 
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
     """Crea equipos optimizando la compatibilidad y respetando las restricciones"""
@@ -259,26 +227,8 @@ def print_team_analysis(teams: List[List[Participant]]):
     for i, team in enumerate(teams, 1):
         print(f"\nEquipo {i} ({len(team)} miembros):")
         print("Miembros:", ", ".join(p.name for p in team))
-        # Analizar características del equipo
-        roles = [p.preferred_role for p in team]
-        objectives = [classificador_ai(p.objective) for p in team]
-        exp_levels = [p.experience_level for p in team]
+
         
-        print(f"Roles: {', '.join(roles)}")
-        print(f"Objetivos: {', '.join(objectives)}")
-        print(f"Niveles de experiencia: {', '.join(exp_levels)}")
-        
-        # Calcular compatibilidad promedio del equipo
-        if len(team) > 1:
-            scores = []
-            for i in range(len(team)):
-                for j in range(i + 1, len(team)):
-                    scores.append(calculate_compatibility_score(team[i], team[j]))
-            avg_score = np.mean(scores)
-            print(f"Compatibilidad promedio del equipo: {avg_score:.2f}")
-        
-        print("-" * 30)
-   
 
 def main() -> None:
     with open("data/datathon_participants.json", "r", encoding="utf-8") as archivo:
@@ -286,6 +236,7 @@ def main() -> None:
 
     df = pd.read_json("data/datathon_participants.json")
     print(df.loc[df['id'] == "2ebad15c-c0ef-4c04-ba98-c5d98403a90c" ])
+          
 
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
@@ -293,25 +244,7 @@ def noumain() -> None:
     persona1= df.loc[0]
     persona2= df.loc[1]
 
-    print(calculate_compatibility_score(persona1, persona2))
-    with open("data/datathon_participants.json", "r", encoding="utf-8") as archivo:
-        datos = json.load(archivo)  # Cargar el contenido como un diccionario de Python
-
-    df = pd.read_json("data/datathon_participants.json")
-    print(df.loc[df['id'] == "2ebad15c-c0ef-4c04-ba98-c5d98403a90c" ])
-
-def main2():
-    # Leer el archivo JSON
-    with open("datathon_participants.json", "r") as file:
-        data = json.load(file)
-    
-    # Encontrar los grupos basados en idiomas
-    groups = create_list_lenguages(data)
-    
-    # Mostrar los resultados en el formato de salida requerido
-    output = []
-    for group in groups:
-        output.append([participant for participant in group])
+    print(compara(persona1, persona2))
 
 if __name__ == '__main__':
     noumain()

@@ -7,6 +7,7 @@ from typing import Dict, List
 import uuid
 import json
 from math import sqrt
+from collections import defaultdict
 
 @dataclass
 class Participant:
@@ -159,9 +160,65 @@ def compara (p1:Participant , p2:Participant) -> float:
     compatibilitat_p1_p2=sqrt(suma_score)
     return compatibilitat_p1_p2
             
+def create_list_lenguages(participants: List[Dict], max_group_size: int = 4) -> List[List[Dict]]:
+    """
+    Agrupa a los participantes en función de los idiomas que hablan, minimizando el número de grupos.
+    Los participantes sin idiomas (`preferred_languages` vacío) se distribuyen equitativamente entre los grupos existentes.
 
+    Args:
+        participants (list): Lista de diccionarios con los detalles de los participantes.
 
-def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
+    Returns:
+        List[List[Dict]]: Lista de grupos con los participantes como diccionarios.
+    """
+    final_groups = create_list_friends(participants, max_group_size)
+    
+    language_groups = defaultdict(list)
+    
+    # Primero, agrupar por idiomas
+    for participant in participants:
+        languages = set(participant.get("preferred_languages", []))
+        if languages:
+            language_groups[frozenset(languages)].append(participant)
+    
+    # Añadir los participantes a los grupos existentes o crear nuevos, respetando el tamaño máximo del grupo
+    for language_group in language_groups.values():
+        for participant in language_group:
+            added = False
+            for group in final_groups:
+                # Intentar añadir al participante a un grupo existente solo si no supera el límite de tamaño
+                if all(languages & set(p.get("preferred_languages", [])) for p in group) and len(group) < max_group_size:
+                    group.append(participant)
+                    added = True
+                    break
+            
+            # Si no se ha añadido, crear un nuevo grupo
+            if not added:
+                # Crear un nuevo grupo solo si no excede el límite
+                if len(language_group) <= max_group_size:
+                    final_groups.append([participant])
+                else:
+                    # Si el grupo de idioma es más grande que el límite, dividirlo en subgrupos
+                    subgroups = [language_group[i:i + max_group_size] for i in range(0, len(language_group), max_group_size)]
+                    final_groups.extend(subgroups)
+    
+    # Procesar los participantes sin idioma
+    no_language_participants = [p for p in participants if not p.get("preferred_languages")]
+    for participant in no_language_participants:
+        # Distribuir los participantes sin idioma entre los grupos más pequeños
+        smallest_group = min(final_groups, key=len)
+        if len(smallest_group) < max_group_size:
+            smallest_group.append(participant)
+        else:
+            # Si el grupo más pequeño ya tiene 4 personas, buscar otro grupo adecuado
+            for group in final_groups:
+                if len(group) < max_group_size:
+                    group.append(participant)
+                    break
+    
+    return final_groups
+
+def create_list_friends(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
     """Crea equipos optimizando la compatibilidad y respetando las restricciones"""
     teams = []
     unassigned = participants.copy()
@@ -169,13 +226,13 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
     # Primero, procesar grupos con amigos registrados (restricción absoluta)
     friend_groups = {}
     for p in participants:
-        if p.friend_registration:
-            group = set([p.id])
-            group.update(p.friend_registration)
+        if p['friend_registration']:
+            group = set(p['id'])
+            group.update(p['friend_registration'])
             key = tuple(sorted(group))
             if key not in friend_groups:
                 friend_groups[key] = []
-            friend_groups[key].extend([p for p in participants if p.id in group])
+            friend_groups[key].extend([p for p in participants if p['id'] in group])
     
     # Añadir grupos de amigos a los equipos
     for group in friend_groups.values():
@@ -184,7 +241,13 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
             for p in group:
                 if p in unassigned:
                     unassigned.remove(p)
-    
+
+    return teams     
+
+def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]: 
+    teams = []
+    unassigned = participants.copy()
+
     # Crear matriz de compatibilidad para participantes restantes
     while unassigned:
         current_team = [unassigned.pop(0)]
@@ -217,7 +280,6 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
     
     return teams
 
-
 def print_team_analysis(teams: List[List[Participant]]):
     """Imprime un análisis detallado de los equipos formados"""
     print("\nANÁLISIS DE EQUIPOS FORMADOS:")
@@ -226,8 +288,6 @@ def print_team_analysis(teams: List[List[Participant]]):
     for i, team in enumerate(teams, 1):
         print(f"\nEquipo {i} ({len(team)} miembros):")
         print("Miembros:", ", ".join(p.name for p in team))
-
-        
 
 def main() -> None:
     with open("data/datathon_participants.json", "r", encoding="utf-8") as archivo:
@@ -240,10 +300,28 @@ def main() -> None:
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
 
-    persona1= df.loc[0]
-    persona2= df.loc[3]
+    persona1 = df.loc[0]
+    persona2 = df.loc[3]
 
     print(compara(persona1, persona2))
+
+    with open("datathon_participants.json", "r") as file:
+        data = json.load(file)
+    
+    # Encontrar los grupos basados en idiomas
+    groups_json = create_list_lenguages(data)
+    
+    # Mostrar los resultados en el formato de salida requerido
+    grups_llista = []
+    for group in groups_json:
+        grups_llista.append([participant for participant in group])
+
+    # Imprimir cada grupo por separado
+    for i, group in enumerate(grups_llista, 1):  # Para enumerar los grupos y añadir un número de grupo
+        print(f"Grupo {i}:")
+        for persona in group:
+            print(persona['name'])
+        print()  # Añadir una línea en blanco entre grupos
 
 if __name__ == '__main__':
     noumain()

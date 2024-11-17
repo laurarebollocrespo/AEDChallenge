@@ -70,6 +70,6 @@ def create_teams():
     # Form teams and return JSON-like structure
     teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
     
-    return json.dumps(teams_by_skill, indent=4)  # Convert to JSON string for readability
+    return teams_by_skill  # Convert to JSON string for readability
 
 print (create_teams())

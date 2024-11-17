@@ -201,8 +201,7 @@ def create_teams(participants: List[Participant], max_team_size: int = 4) -> Lis
                 
                 if compatible:
                     # Calcular score promedio con el equipo actual
-                    avg_score = np.mean([calculate_compatibility_score(member, candidate) 
-                                       for member in current_team])
+                    avg_score = np.mean([calculate_compatibility_score(member, candidate) for member in current_team])
                     
                     if avg_score > best_score:
                         best_score = avg_score
@@ -242,7 +241,7 @@ def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
 
     persona1= df.loc[0]
-    persona2= df.loc[1]
+    persona2= df.loc[3]
 
     print(compara(persona1, persona2))
 

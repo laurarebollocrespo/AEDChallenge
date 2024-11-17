@@ -2,7 +2,7 @@
     <img src="public/aed_logo.png" width="200" alt="AED logo" />
     <h1>Repte AED - Datathon FME 2024</h1>
 </div>
-
+La informació inportant es troba a 'programa_definitiu-py', 'equips.py' i 'web.py' (aquesta última es la interfície).
 ## Overview
 
 While brainstorming this year's challenges, we realized that one of the most interesting data problems was right in front of us - the team formation process at Datathon FME itself! 

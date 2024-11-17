@@ -17,6 +17,10 @@ df = None
 if 'df' not in st.session_state:
     st.session_state.df = None
 
+# Variable para almacenar el estado de los equipos formados
+if 'equipos_formados' not in st.session_state:
+    st.session_state.equipos_formados = False
+
 # Pestañas: Controlamos el acceso a ellas
 if st.session_state.df is None:
     tab_titles = ["Subir Datos y Crear Equipos"]
@@ -53,14 +57,29 @@ with tabs[0]:
             
             # Botón para formar equipos
             if st.button("Formar Equipos"):
-                st.write("Procesando...")
+                st.session_state.equipos_formados = False  # Reiniciar antes de formar equipos
+                st.write("Procesando...")  # Mostrar mensaje mientras se procesan los equipos
+                
+                # Aquí llamas a tu lógica para formar los equipos, por ejemplo:
+                # Formar los equipos (esto es solo un ejemplo)
+                # Supón que después de un retraso simulado o lógica, los equipos se forman.
+                # Actualizar el estado
+                st.session_state.equipos_formados = True
                 st.success("¡Equipos formados exitosamente!")
+                st.write("**¡Los equipos ya han sido formados!**")
+
         except Exception as e:
             st.error("Hubo un error al cargar el archivo. Por favor, verifica el formato.")
             
     # Mostrar mensaje si el archivo no ha sido subido
     if st.session_state.df is None:
         st.warning("Por favor, sube el archivo JSON para poder continuar con las demás funciones.")
+
+    # Si los equipos están formados, no mostrar "Procesando..."
+    if st.session_state.equipos_formados:
+        st.write("**¡Los equipos han sido formados!**")
+    else:
+        st.write("Haz clic en 'Formar Equipos' para comenzar.")
 
 # Pestaña 2: Gráficas de equipos
 if len(tab_titles) > 1:  # Verifica si se deben mostrar las pestañas adicionales

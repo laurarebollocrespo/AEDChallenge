@@ -152,7 +152,11 @@ def calculate_compatibility_score(p1: Participant) -> list[int|str]:
     
     return scores 
 
-'''
+def compara (p1:list[int|str] , p2:list[int|str]): 
+    p1= calculate_compatibility_score(p1)
+
+
+
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
     """Crea equipos optimizando la compatibilidad y respetando las restricciones"""
     teams = []

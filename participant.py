@@ -244,9 +244,9 @@ def main() -> None:
 
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
-    for i in range(0,10):
-        persona1= df.loc[i]
-        print(calculate_compatibility_score(persona1))
+
+    persona1= df.loc[1]
+    print(calculate_compatibility_score(persona1))
 
 if __name__ == '__main__':
     noumain()

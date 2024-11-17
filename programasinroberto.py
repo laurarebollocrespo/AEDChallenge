@@ -6,7 +6,7 @@ from transformers import pipeline
 from typing import Dict, List
 import uuid
 import json
-
+from math import sqrt
 
 @dataclass
 class Participant:
@@ -41,30 +41,19 @@ def check_absolute_restrictions(p1: Participant, p2: Participant) -> bool:
     
     return True
 
-def calculate_objective_score(p1: Participant) -> int:
+def calculate_objective_score(p1: Participant) -> float:
     """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
     
     p1_intention = classificador_ai(p1.objective)
     if p1_intention == 'socialize':
-        return 1
+        return 1*45
     elif p1_intention == 'learn':
-        return 2
+        return 2*45
     elif p1_intention == 'enjoy':
-        return 3
+        return 3*45
     else:
-        return 4
-def calculate_objective_score(p1: Participant) -> int:
-    """Calcula la puntuación basada en objetivos usando el clasificador AI (45%)"""
+        return 4*45
     
-    p1_intention = classificador_ai(p1.objective)
-    if p1_intention == 'socialize':
-        return 1
-    elif p1_intention == 'learn':
-        return 2
-    elif p1_intention == 'enjoy':
-        return 3
-    else:
-        return 4
 
 
 def classificador_ai(text: str) -> str:
@@ -105,34 +94,34 @@ def calculate_role_score(p1: Participant) -> str:
     """Calcula la puntuación basada en roles preferidos (20%) - premia la diferencia"""
     return p1.preferred_role
 
-def calculate_experience_score(p1: Participant) -> int:
+def calculate_experience_score(p1: Participant) -> float:
     """Calcula la puntuación basada en nivel de experiencia (12%)"""
     exp_levels = {"Beginner": 1, "Intermediate": 2, "Advanced": 3}
 
-    return exp_levels[p1.experience_level]
+    return exp_levels[p1.experience_level]*12
 
-def calculate_hackathon_score(p1: Participant) -> int:
+def calculate_hackathon_score(p1: Participant) -> float:
     """Calcula la puntuación basada en experiencia en hackathons (8%)"""
-    return p1.hackathons_done
+    return p1.hackathons_done*8
 
-def calculate_study_year_score(p1: Participant) -> int:
+def calculate_study_year_score(p1: Participant) -> float:
     """Calcula la puntuación basada en año de estudio (8%)"""
     years = {"1st year": 1, "2nd year": 2, "3rd year": 3, "4th year": 4, 
             "Masters": 5, "PhD": 6}
 
-    return years[p1.year_of_study]
+    return years[p1.year_of_study]*8
 
-def calculate_team_size_score(p1: Participant) -> int:
+def calculate_team_size_score(p1: Participant) -> float:
     """Calcula la puntuación basada en tamaño de equipo preferido (2%)"""
-    return p1.preferred_team_size
+    return p1.preferred_team_size*2
 
 
-def calculate_availability_score(p1: Participant) -> int:
+def calculate_availability_score(p1: Participant) -> float:
     """Calcula la puntuación basada en disponibilidad (5%)"""
     p1_availability_score  = p1.availability
     comptar = sum(1 for value in p1_availability_score.values() if value)
 
-    return comptar
+    return comptar*5
 
 
 
@@ -152,9 +141,24 @@ def calculate_compatibility_score(p1: Participant) -> list[int|str]:
     
     return scores 
 
-def compara (p1:list[int|str] , p2:list[int|str]): 
-    p1= calculate_compatibility_score(p1)
-
+def compara (p1:Participant , p2:Participant) -> float:
+    p1_score= calculate_compatibility_score(p1)
+    p2_score = calculate_compatibility_score(p2)
+    suma_score = 0
+    for i in range(len(p1_score)):
+        p1_element= p1_score[i]
+        p2_element= p2_score[i]
+        if isinstance(p1_element, str) and isinstance(p2_element, str):
+            if p1_element != p2_element:
+                suma_score = suma_score + 20
+            else:
+                pass
+        else:
+            suma_score = suma_score + abs(p1_element - p2_element)**2
+    
+    compatibilitat_p1_p2=sqrt(suma_score)
+    return compatibilitat_p1_p2
+            
 
 
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
@@ -223,26 +227,7 @@ def print_team_analysis(teams: List[List[Participant]]):
     for i, team in enumerate(teams, 1):
         print(f"\nEquipo {i} ({len(team)} miembros):")
         print("Miembros:", ", ".join(p.name for p in team))
-        'EXTRA
-        # Analizar características del equipo
-        roles = [p.preferred_role for p in team]
-        objectives = [classificador_ai(p.objective) for p in team]
-        exp_levels = [p.experience_level for p in team]
-        
-        print(f"Roles: {', '.join(roles)}")
-        print(f"Objetivos: {', '.join(objectives)}")
-        print(f"Niveles de experiencia: {', '.join(exp_levels)}")
-        
-        # Calcular compatibilidad promedio del equipo
-        if len(team) > 1:
-            scores = []
-            for i in range(len(team)):
-                for j in range(i + 1, len(team)):
-                    scores.append(calculate_compatibility_score(team[i], team[j]))
-            avg_score = np.mean(scores)
-            print(f"Compatibilidad promedio del equipo: {avg_score:.2f}")
-        
-        print("-" * 30)
+
         
 
 def main() -> None:
@@ -256,8 +241,10 @@ def main() -> None:
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
 
-    persona1= df.loc[1]
-    print(calculate_compatibility_score(persona1))
+    persona1= df.loc[0]
+    persona2= df.loc[1]
+
+    print(compara(persona1, persona2))
 
 if __name__ == '__main__':
-    noumain()'''
+    noumain()

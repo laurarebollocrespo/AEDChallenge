@@ -1,4 +1,5 @@
 import pandas as pd
+import json
 
 def divide_by_skill(participants_df):
     """
@@ -58,25 +59,20 @@ def form_teams_by_skill(high_skill, mid_skill, low_skill, max_team_size=4):
         "Low Skill": low_skill_teams
     }
 
+def create_teams ():
 
-import json
+    # Crear un DataFrame de pandas
+    participants_df = pd.read_json("datathon_participants.json")
+    
+    # Dividir participantes en grupos de habilidades
+    high_skill, mid_skill, low_skill = divide_by_skill(participants_df)
 
-# Leer el archivo JSON
-with open("datathon_participants.json", "r") as file:
-    data = json.load(file)
+    # Formar equipos por habilidad
+    teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
 
-# Crear un DataFrame de pandas
-participants_df = pd.DataFrame(data)
+    # Dividir participantes en grupos de habilidades
+    high_skill, mid_skill, low_skill = divide_by_skill(participants_df)
 
-# Dividir participantes en grupos de habilidades
-high_skill, mid_skill, low_skill = divide_by_skill(participants_df)
+    teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
 
-# Formar equipos por habilidad
-teams_by_skill = form_teams_by_skill(high_skill, mid_skill, low_skill)
-
-print (teams_by_skill)
-# Mostrar los equipos formados por habilidad
-for skill_level, teams in teams_by_skill.items():
-    print(f"\nEquipos de habilidad {skill_level}:")
-    for i, team in enumerate(teams, 1):
-        print(f"  Equipo {i}: {', '.join(team)}")
+    return teams_by_skill

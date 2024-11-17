@@ -126,7 +126,6 @@ def calculate_team_size_score(p1: Participant) -> int:
     """Calcula la puntuación basada en tamaño de equipo preferido (2%)"""
     return p1.preferred_team_size
 
-
 def calculate_availability_score(p1: Participant) -> int:
     """Calcula la puntuación basada en disponibilidad (5%)"""
     p1_availability_score  = p1.availability
@@ -136,23 +135,23 @@ def calculate_availability_score(p1: Participant) -> int:
 
 
 
-def calculate_compatibility_score(p1: Participant) -> list[int|str]:
+def calculate_compatibility_score(p1: Participant) -> float:
     """Calcula la puntuación total de compatibilidad entre dos participantes"""
 
     # Calcular puntuaciones individuales con sus pesos
-    scores: list = [int|str]
-    scores= [
+    scores = [
         (calculate_objective_score(p1)),
         (calculate_role_score(p1)),
         (calculate_experience_score(p1)),
         (calculate_hackathon_score(p1)),
         (calculate_study_year_score(p1)),
         (calculate_availability_score(p1)),
-        (calculate_team_size_score(p1)) ]
+        (calculate_team_size_score(p1))
+    ]
     
-    return scores 
+    return scores #sense ponderar!
 
-'''
+
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
     """Crea equipos optimizando la compatibilidad y respetando las restricciones"""
     teams = []
@@ -219,7 +218,6 @@ def print_team_analysis(teams: List[List[Participant]]):
     for i, team in enumerate(teams, 1):
         print(f"\nEquipo {i} ({len(team)} miembros):")
         print("Miembros:", ", ".join(p.name for p in team))
-        'EXTRA
         # Analizar características del equipo
         roles = [p.preferred_role for p in team]
         objectives = [classificador_ai(p.objective) for p in team]
@@ -239,7 +237,7 @@ def print_team_analysis(teams: List[List[Participant]]):
             print(f"Compatibilidad promedio del equipo: {avg_score:.2f}")
         
         print("-" * 30)
-        
+   
 
 def main() -> None:
     with open("data/datathon_participants.json", "r", encoding="utf-8") as archivo:
@@ -247,13 +245,24 @@ def main() -> None:
 
     df = pd.read_json("data/datathon_participants.json")
     print(df.loc[df['id'] == "2ebad15c-c0ef-4c04-ba98-c5d98403a90c" ])
-          
+
+def calcular_afinitat (p1,p2):
+    score_p1 = calculate_compatibility_score(p1)
+    score_p2 = calculate_compatibility_score(p2)
+
+    resultado = [
+    v1**2 - v2**2 if i != 1 else score_p1[1] == score_p2[1]
+    for i, (v1, v2) in enumerate(zip(score_p1, score_p2))
+]
+    return resultado
 
 def noumain() -> None:
     df = pd.read_json('data/datathon_participants.json')
 
-    persona1= df.loc[1]
-    print(calculate_compatibility_score(persona1))
+    persona1= df.loc[0]
+    persona2= df.loc[1]
+
+    print(calcular_afinitat(persona1, persona2))
 
 if __name__ == '__main__':
-    noumain()'''
+    noumain()

@@ -2,6 +2,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import random
 import pandas as pd
+import equips
 
 st.set_page_config(page_title="Group Generator", layout="centered", page_icon="👤")
 
@@ -31,39 +32,43 @@ with tabs[0]:
     st.header("Create teams")
     st.write("Upload a JSON file with participant data to get started.")
 
-    # Campo para subir archivo
     file = st.file_uploader("Upload your JSON file here", type="json")
 
     if file is not None:
         try:
-            # Leer los datos subidos
             st.session_state.df = pd.read_json(file)
             df = st.session_state.df
             st.success("File uploaded successfully!")
             
-            # Mostrar los datos cargados
             st.write("Preview of the uploaded data:")
-            st.dataframe(df.head())
-            
-            # Botón para formar equipos
+            st.dataframe(df.head())  
+           
             if st.button("Create Teams"):
+                # Llista dels equips
+                grups = equips.create_teams()
+                st.session_state.teams = grups
                 st.success("Teams formed successfully!")
         except Exception as e:
             st.error("There was an error uploading the file. Please check the format.")
             
-    # Mostrar mensaje si el archivo no ha sido subido
     if st.session_state.df is None:
         st.warning("Please upload the JSON file to continue with the other functions.")
 
-# Pestaña 2: Gráficas de equipos
-if len(tab_titles) > 1:  # Verifica si se deben mostrar las pestañas adicionales
+# Pestaña 2: 
+if len(tab_titles) > 1: 
     with tabs[1]:
-        with st.expander("View Teams"):  # Encapsulamos esta sección en un expander para que sea más limpio
+        grups = equips.create_teams()
+        st.write(f"**El nombre d'equips és:** {len(grups)}")
+        st.write()
+
+        with st.expander("View Teams"): 
             if 'df' not in st.session_state or st.session_state.df is None:
                 st.warning("You must first upload the data before accessing this tab.")
             else:
+                grups = equips.create_teams()
                 st.header("Team Proposal")
                 st.write("Here you can see the teams proposed based on the uploaded data.")
+                
                 
                 if st.button("View Teams"):
                     # Si los equipos ya están creados en session_state, los mostramos.
@@ -71,29 +76,18 @@ if len(tab_titles) > 1:  # Verifica si se deben mostrar las pestañas adicionale
                         st.write("**This is our team proposal:**")
                         
                         for team in st.session_state.teams:
-                            with st.expander(team['team_name']):  # Usamos expander para cada equipo
+                            with st.expander(grups['team_grup']):  # Usamos expander para cada equipo
                                 # Mostrar los miembros de cada equipo
                                 st.write("**Members:**")
                                 for member in team['members']:
                                     st.write(f"- {member}")
-                                
-                                # Agregar más detalles del equipo si es necesario (por ejemplo, el objetivo del equipo)
-                                st.write("**Objective/Intention:** 'Having fun', 'Learning', 'Challenge'")  # Ejemplo de detalles del equipo
-                                
-                                # Si se desea más detalles del miembro, se puede agregar botones
-                                for member in team['members']:
-                                    if st.button(f"Show more details of {member}"):
-                                        # Mostrar detalles adicionales del miembro (esto puede provenir de df)
-                                        st.write(f"Details for {member}:")
-                                        st.write(f"Age: {random.randint(20, 30)}")  # Ejemplo de edad aleatoria
-                                        st.write(f"Experience Level: Beginner")  # Ejemplo de nivel de experiencia
-                                        st.write(f"Objective: Learning new skills")  # Ejemplo de objetivo
+
                     else:
                         st.warning("Teams have not been formed yet. Please upload data and generate teams.")
                 
 
 # Pestaña 3: 
-if len(tab_titles) > 2:  # Verifica si se deben mostrar las pestañas adicionales
+if len(tab_titles) > 2: 
     with tabs[2]:
         if st.session_state.df is None:
             st.warning("You must first upload the data before accessing this tab.")
@@ -111,8 +105,9 @@ if len(tab_titles) > 2:  # Verifica si se deben mostrar las pestañas adicionale
                 ax.set_ylabel("Teams", fontsize=6)
 
                 st.pyplot(fig)
+
 # Pestaña 4: 
-if len(tab_titles) > 3:  # Verifica si se deben mostrar las pestañas adicionales
+if len(tab_titles) > 3:  
     with tabs[3]:
         if st.session_state.df is None:
             st.warning("You must first upload the data before accessing this tab.")
@@ -132,15 +127,14 @@ if len(tab_titles) > 3:  # Verifica si se deben mostrar las pestañas adicionale
             st.pyplot(fig)
 
 # Pestaña 5: 
-if len(tab_titles) > 4:  # Verifica si se deben mostrar las pestañas adicionales
+if len(tab_titles) > 4: 
     with tabs[4]:
         if st.session_state.df is None:
             st.warning("You must first upload the data before accessing this tab.")
         else:
             st.header("Search for a Member in a Team")
             st.write("Enter a name or generate a random one to see which team they are in.")
-
-            # Campo para buscar por nombre
+            
             nombre_leer = st.text_input("Enter a name to see which team they belong to:")
             if nombre_leer:
                 if nombre_leer in df['name'].tolist():
@@ -148,19 +142,16 @@ if len(tab_titles) > 4:  # Verifica si se deben mostrar las pestañas adicionale
                 else:
                     st.write(f'{nombre_leer} is not a member of any group.')
 
-            # Botón para generar un nombre aleatorio
             if st.button("Generate random name"):
                 nombre_random = random.choice(df['name'].tolist())
                 st.session_state.nombre_input = nombre_random
 
-            # Mostrar información del miembro seleccionado
             if 'nombre_input' in st.session_state:
                 nombre = st.session_state.nombre_input
 
                 st.write(f"**Selected name:** {nombre}")
-                st.write(f"**{nombre}'s teammates:**")  # Aquí puedes enlazarlo con el equipo correspondiente.
+                st.write(f"**{nombre}'s teammates:**")  # Enlazar con el equipo correspondiente.
 
-                # Mostrar más detalles del miembro
                 if st.button("Show more details"):
                     si = df.loc[df['name'] == nombre]
                     edad = si['age'].iloc[0]
@@ -173,7 +164,7 @@ if len(tab_titles) > 4:  # Verifica si se deben mostrar las pestañas adicionale
                     st.write(f"**Experience level:** {experience_level}")
                     st.write(f"**Objectives:** {objective}")
 
-# Estilo personalizado para los botones
+
 st.markdown(
     """
     <style>

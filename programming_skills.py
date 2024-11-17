@@ -45,16 +45,7 @@ def divide_by_skill(participants: List[Participant]) -> Tuple[List[Participant],
     mid_skill = [p for p in participants if 4 <= p.average_skill <= 7]  # Habilidades medias
     low_skill = [p for p in participants if p.average_skill < 4]  # Habilidades bajas
     
-    print(high_skill, mid_skill, low_skill)
     return high_skill, mid_skill, low_skill
-
-import json
-from programming_skills import divide_by_skill
-import pandas as pd
-#si quiere ir solo, separarlo,   ammigos, idioma, lenguage
-participants = pd.read_json("data/datathon_participants.json")
- # Dividir en tres grupos por habilidad
-high_skill, mid_skill, low_skill = divide_by_skill(participants)
 
 # Función para optimizar compatibilidad dentro de un grupo
 def optimize_group(group: List[Participant]) -> List[Participant]:

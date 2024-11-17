@@ -128,10 +128,11 @@ if len(tab_titles) > 2:
             st.subheader("Top Interests of Participants")
             for i, (interest, count) in enumerate(intereses.items(), start=1):
                 st.write(f"{i}. {interest}: {count} participants")
+            st.write()
+            st.write()
 
             # Objectives
             st.subheader("Objectives")
-
             objs = {'Socialize': 333, 'Enjoy': 304, 'Learn': 276, 'Win': 62}
 
             fig, ax = plt.subplots(figsize=(4, 2))

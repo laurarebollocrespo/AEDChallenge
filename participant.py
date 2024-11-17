@@ -150,8 +150,7 @@ def calculate_compatibility_score(p1: Participant) -> list[int|str]:
         (calculate_availability_score(p1)),
         (calculate_team_size_score(p1)) ]
     
-    return scores #sense ponderar!
-
+    return scores 
 
 '''
 def create_teams(participants: List[Participant], max_team_size: int = 4) -> List[List[Participant]]:
